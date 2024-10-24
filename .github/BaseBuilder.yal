@@ -1,0 +1,22 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: "*"
+
+jobs:
+
+  Python310Slim:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Log in to DockerHub
+      env:
+        DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+        DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      run: |
+        docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+        docker buildx build -t forsythcreations/base:Python310Slim --platform linux/arm64,linux/amd64 --file ./Python310Slim/Dockerfile --push Python310Slim 
+      if : ${{ github.ref == 'refs/heads/main' }}
